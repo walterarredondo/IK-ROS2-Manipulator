@@ -1,0 +1,424 @@
+<?xml version="1.0" ?>
+<sdf version="1.10">
+    <world name="car_world">
+        <physics name="1ms" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+        </physics>
+        <plugin
+            filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics">
+        </plugin>
+        <plugin
+            filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands">
+        </plugin>
+        <plugin
+            filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster">
+        </plugin>
+
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    </plane>
+                </geometry>
+                </collision>
+                <visual name="visual">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    <size>100 100</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <ambient>0.8 0.8 0.8 1</ambient>
+                    <diffuse>0.8 0.8 0.8 1</diffuse>
+                    <specular>0.8 0.8 0.8 1</specular>
+                </material>
+                </visual>
+            </link>
+        </model>
+	<!--MODEL DESCRIPTION-->
+	<model name='arm' canonical_link='plate'>
+		<pose relative_to='world'>0 0 0 0 0 0</pose>
+		<link name='plate'>
+        		<pose relative_to='__model__'>0 0 0.020 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <cylinder>
+					<radius>0.05</radius>
+					<length>0.04</length>
+				    </cylinder>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <cylinder>
+					<radius>0.05</radius>
+					<length>0.04</length>
+				    </cylinder>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='plate_joint_1'>
+        		<pose relative_to='plate'>0 0 0.035 1.570796 0 1.570796</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>1.0 0.0 0.0 1</ambient>
+				    <diffuse>1.0 0.0 0.0 1</diffuse>
+				    <specular>1.0 0.0 0.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='bar1'>
+        		<pose relative_to='joint1'>0 0.0475 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					  <size>0.02 0.065 0.02</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					  <size>0.02 0.065 0.020</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+		<link name='bar1a'>
+        		<pose relative_to='bar1'>0.0025 0.0425 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					  <size>0.025 0.02 0.020</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					  <size>0.025 0.02 0.02</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='plate_joint_2'>
+        		<pose relative_to='bar1a'>0.0275 0 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>1.0 0.0 0.0 1</ambient>
+				    <diffuse>1.0 0.0 0.0 1</diffuse>
+				    <specular>1.0 0.0 0.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+			    </geometry>
+			</collision>
+		</link>
+
+		<link name='bar2'>
+        		<pose relative_to='plate_joint_2'>0 0.045 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					<size>0.02 0.060 0.02</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					<size>0.02 0.060 0.02</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+	
+		<link name='plate_joint_3'>
+        		<pose relative_to='bar2'>0 0.045 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>1.0 0.0 0.0 1</ambient>
+				    <diffuse>1.0 0.0 0.0 1</diffuse>
+				    <specular>1.0 0.0 0.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <cylinder>
+					<radius>0.015</radius>
+					<length>0.01</length>
+				    </cylinder>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='bar3'>
+        		<pose relative_to='plate_joint_3'>-0.01 0.0425 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					<size>0.04 0.055 0.02</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					<size>0.04 0.055 0.02</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='bar3a'>
+        		<pose relative_to='bar3'>0.01 0.03 0 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					<size>0.03 0.005 0.04</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					<size>0.03 0.005 0.04</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='bar4a'>
+        		<pose relative_to='bar3a'>0 0.0175 -0.0025 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					<size>0.02 0.03 0.005</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					<size>0.02 0.03 0.005</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+
+		<link name='bar4b'>
+        		<pose relative_to='bar3a'>0 0.0175 0.0025 0 0 0</pose>			
+			<visual name='visual'>
+				<geometry>
+				    <box>
+					<size>0.02 0.03 0.005</size>
+				    </box>
+				</geometry>
+				<!--let's add color to our link-->
+				<material>
+				    <ambient>0.0 0.0 1.0 1</ambient>
+				    <diffuse>0.0 0.0 1.0 1</diffuse>
+				    <specular>0.0 0.0 1.0 1</specular>
+				</material>
+			</visual>
+			<collision name='collision'>
+			    <geometry>
+				    <box>
+					<size>0.02 0.03 0.005</size>
+				    </box>
+			    </geometry>
+			</collision>
+		</link>
+
+            <!--left wheel joint-->
+            <joint name='joint0' type='revolute'>
+                <pose relative_to='plate'/>
+                <parent>plate</parent>
+                <child>plate_joint_1</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 0 1</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>    <!--negative infinity-->
+                        <upper>1.79769e+308</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='joint1' type='revolute'>
+                <pose relative_to='plate_joint_1'/>
+                <parent>plate_joint_1</parent>
+                <child>bar1</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 1 0</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>    <!--negative infinity-->
+                        <upper>1.79769e+308</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='joint2' type='revolute'>
+                <pose relative_to='plate_joint_2'/>
+                <parent>bar1a</parent>
+                <child>bar2</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 1 0</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>    <!--negative infinity-->
+                        <upper>1.79769e+308</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+            <joint name='joint3' type='revolute'>
+                <pose relative_to='plate_joint_3'/>
+                <parent>bar2</parent>
+                <child>bar3</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 1 0</xyz>
+                    <limit>
+                        <lower>-1.79769e+308</lower>    <!--negative infinity-->
+                        <upper>1.79769e+308</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+
+            <joint name='joint4a' type='prismatic'>
+                <pose relative_to='bar3a'/>
+                <parent>bar3a</parent>
+                <child>bar4a</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 0 1</xyz>
+                    <limit>
+                        <lower>-0.015</lower>    <!--negative infinity-->
+                        <upper>0</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+
+            <joint name='joint4b' type='prismatic'>
+                <pose relative_to='bar3a'/>
+                <parent>bar3a</parent>
+                <child>bar4b</child>
+                <axis>
+                    <xyz expressed_in='__model__'>0 0 1</xyz>
+                    <limit>
+                        <lower>0</lower>    <!--negative infinity-->
+                        <upper>0.015</upper>     <!--positive infinity-->
+                    </limit>
+                </axis>
+            </joint>
+
+	</model>
+    </world>
+</sdf>

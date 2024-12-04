@@ -1,0 +1,8 @@
+# Goal
+geometry_msgs/Point target_pose
+---
+# Result
+float64[] joint_positions
+---
+# Feedback
+int32 progress
