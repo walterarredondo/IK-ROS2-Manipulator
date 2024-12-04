@@ -12,6 +12,9 @@ import hashlib
 import pickle
 import serial
 import time
+import sys
+import os
+import argparse
 
 class RobotArmIK:
     def __init__(self, dh_params):
@@ -366,85 +369,6 @@ class RobotArmIK:
         plt.show()
 
 
-
-
-
-def convert_joint_to_servo_angle(joint_angle, joint_index):
-    """
-    Convert radians from robot arm IK to servo angles (0-180 degrees).
-    
-    :param joint_angle: Joint angle in radians
-    :param joint_index: Index of the joint (0-based)
-    :return: Servo angle (0-180 degrees)
-    """
-    # Specific adjustments for each joint based on servo mounting and arm geometry
-    joint_mappings = [
-        # Joint 1 (Base): Map from [-π/2, π/2] to [0, 180]
-        lambda angle: np.rad2deg(angle) + 90,
-        
-        # Joint 2: Map from [-π/2, π/2] to [0, 180]
-        lambda angle: np.rad2deg(angle) + 90,
-        
-        # Joint 3: More complex mapping, might need calibration
-        lambda angle: np.rad2deg(angle) + 90,
-        
-        # Joint 4: Similar to others
-        lambda angle: np.rad2deg(angle) + 90
-    ]
-    
-    # Clip the result to 0-180 range
-    return max(0, min(180, int(joint_mappings[joint_index](joint_angle))))
-
-def send_joint_config_to_arduino(final_joints, port='/dev/ttyUSB0', baud_rate=115200, timeout=2):
-    """
-    Send joint configurations to Arduino via serial communication.
-    
-    :param final_joints: NumPy array of joint angles in radians
-    :param port: Serial port name (default '/dev/ttyUSB0')
-    :param baud_rate: Serial communication baud rate
-    :param timeout: Connection timeout in seconds
-    """
-    try:
-        # Open serial connection
-        ser = serial.Serial(port, baud_rate, timeout=timeout)
-        
-        # Wait for Arduino to initialize
-        time.sleep(2)
-        
-        # Convert and send each joint angle
-        for joint_index, joint_angle in enumerate(final_joints, 1):
-            servo_angle = convert_joint_to_servo_angle(joint_angle, joint_index - 1)
-            
-            # Format: "joint,angle\n"
-            command = f"{joint_index},{servo_angle}\n"
-            ser.write(command.encode('utf-8'))
-            
-            # Small delay to ensure Arduino processes each command
-            time.sleep(0.5)
-            
-            # Optional: Read and print Arduino's response
-            if ser.in_waiting:
-                response = ser.readline().decode('utf-8').strip()
-                print(f"Arduino response: {response}")
-        
-        print("Joint configuration sent successfully!")
-    
-    except serial.SerialException as e:
-        print(f"Serial communication error: {e}")
-        print("Ensure:")
-        print("1. Arduino is connected")
-        print("2. Correct port is specified")
-        print("3. No other program is using the port")
-    
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-    
-    finally:
-        # Close serial connection if it was opened
-        if 'ser' in locals() and ser.is_open:
-            ser.close()
-
-
 def generate_joint_configurations(joint_limits, delta_angle):
     """
     Generate all possible joint configurations within given limits.
@@ -570,8 +494,83 @@ def find_best_initial_position(robot_ik, target, joint_limits, delta_angle, no_r
     return best_config[['q1', 'q2', 'q3', 'q4']].values
 
 
-if __name__ == "__main__":
-    # Example DH Parameters (same as before)
+def convert_joint_to_servo_angle(joint_angle, joint_index):
+    """
+    Convert radians from robot arm IK to servo angles (0-180 degrees).
+    
+    :param joint_angle: Joint angle in radians
+    :param joint_index: Index of the joint (0-based)
+    :return: Servo angle (0-180 degrees)
+    """
+    # Specific adjustments for each joint based on servo mounting and arm geometry
+    joint_mappings = [
+        # Joint 1 (Base): Map from [-π/2, π/2] to [0, 180]
+        lambda angle: np.rad2deg(angle) + 90,
+        
+        # Joint 2: Map from [-π/2, π/2] to [0, 180]
+        lambda angle: np.rad2deg(angle) + 90,
+        
+        # Joint 3: More complex mapping, might need calibration
+        lambda angle: np.rad2deg(angle) + 90,
+        
+        # Joint 4: Similar to others
+        lambda angle: np.rad2deg(angle) + 90
+    ]
+    
+    # Clip the result to 0-180 range
+    return max(0, min(180, int(joint_mappings[joint_index](joint_angle))))
+
+def send_joint_config_to_arduino(final_joints, port='/dev/ttyUSB0', baud_rate=115200, timeout=2):
+    """
+    Send joint configurations to Arduino via serial communication.
+    
+    :param final_joints: NumPy array of joint angles in radians
+    :param port: Serial port name (default '/dev/ttyUSB0')
+    :param baud_rate: Serial communication baud rate
+    :param timeout: Connection timeout in seconds
+    """
+    try:
+        # Open serial connection
+        ser = serial.Serial(port, baud_rate, timeout=timeout)
+        
+        # Wait for Arduino to initialize
+        time.sleep(2)
+        
+        # Convert and send each joint angle
+        for joint_index, joint_angle in enumerate(final_joints, 1):
+            servo_angle = convert_joint_to_servo_angle(joint_angle, joint_index - 1)
+            
+            # Format: "joint,angle\n"
+            command = f"{joint_index},{servo_angle}\n"
+            ser.write(command.encode('utf-8'))
+            
+            # Small delay to ensure Arduino processes each command
+            time.sleep(0.5)
+            
+            # Optional: Read and print Arduino's response
+            if ser.in_waiting:
+                response = ser.readline().decode('utf-8').strip()
+                print(f"Arduino response: {response}")
+        
+        print("Joint configuration sent successfully!")
+    
+    except serial.SerialException as e:
+        print(f"Serial communication error: {e}")
+        print("Ensure:")
+        print("1. Arduino is connected")
+        print("2. Correct port is specified")
+        print("3. No other program is using the port")
+    
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    
+    finally:
+        # Close serial connection if it was opened
+        if 'ser' in locals() and ser.is_open:
+            ser.close()
+
+def main():
+    # DH Parameters (same as in the original script)
     DH_params = [
         [20, 0, 0, 0],
         [0, sp.Symbol('q1'), 0, 0],
@@ -585,44 +584,84 @@ if __name__ == "__main__":
         [0, 0, 90, 0]
     ]
 
+    # Joint limits
+    joint_limits = [
+        (-pi/2, pi/2),  # Limits for q1
+        (-pi/2, pi/2),  # Limits for q2
+        (-pi/2, pi/2),  # Limits for q3
+        (-pi/2, pi/2)   # Limits for q4
+    ]
+
+    # Create argument parser
+    parser = argparse.ArgumentParser(description='Robot Arm Position Controller')
+    parser.add_argument('x', type=float, help='X coordinate')
+    parser.add_argument('y', type=float, help='Y coordinate')
+    parser.add_argument('z', type=float, help='Z coordinate')
+    parser.add_argument('--port', type=str, default='/dev/ttyUSB0', 
+                        help='Arduino serial port (default: /dev/ttyUSB0)')
+    parser.add_argument('--no-send', action='store_true', 
+                        help='Calculate joint angles without sending to Arduino')
+    parser.add_argument('--plot', action='store_true', 
+                        help='Plot the robot arm configuration')
+
+    # Parse arguments
+    args = parser.parse_args()
+
     # Create Robot Arm solver
     robot_ik = RobotArmIK(DH_params)
 
-    # Joint limits
-    joint_limits = [(-pi/2, pi/2),  # Limits for q1
-                    (-pi/2, pi/2),  # Limits for q2
-                    (-pi/2, pi/2),  # Limits for q3
-                    (-pi/2, pi/2)]  # Limits for q4
-
-    # Target transformation matrix
+    # Create target transformation matrix
     target = np.array([
-        [1, 0, 0, 50],
-        [0, 1, 0, 100],
-        [0, 0, 1, 145],
+        [1, 0, 0, args.x],
+        [0, 1, 0, args.y],
+        [0, 0, 1, args.z],
         [0, 0, 0, 1]
     ])
 
-    # Delta angle (10 degrees)
+    # Delta angle (72 degrees)
     delta_angle = np.deg2rad(72)
 
-    # Find best initial position
-    initial_joints = find_best_initial_position(robot_ik, joint_limits=joint_limits, target=target, delta_angle=delta_angle, no_rotation=True)
+    try:
+        # Find best initial position
+        initial_joints = find_best_initial_position(
+            robot_ik, 
+            target=target, 
+            joint_limits=joint_limits, 
+            delta_angle=delta_angle, 
+            no_rotation=True
+        )
 
-    # Solve Inverse Kinematics with the best initial position
-    final_joints = robot_ik.inverse_kinematics(
-        target,
-        initial_joints,
-        joint_limits=joint_limits,
-        no_rotation=True,
-        max_iterations=10000,
-        position_tolerance=10,
-        rotation_tolerance=1e-1,
-        lambda_damping=0.1,
-        alpha=1
-    )
+        # Solve Inverse Kinematics
+        final_joints = robot_ik.inverse_kinematics(
+            target,
+            initial_joints,
+            joint_limits=joint_limits,
+            no_rotation=True,
+            max_iterations=10000,
+            position_tolerance=10,
+            rotation_tolerance=1e-1,
+            lambda_damping=0.1,
+            alpha=1
+        )
 
-    # Plot final pose
-    robot_ik.plot_pose(final_joints)
+        # Print calculated joint angles
+        print("Calculated Joint Angles (radians):")
+        for i, angle in enumerate(final_joints, 1):
+            print(f"Joint {i}: {angle:.4f} rad")
+        
+        # Plot if requested
+        if args.plot:
+            robot_ik.plot_pose(final_joints)
 
-    # After solving inverse kinematics, send to Arduino
-    send_joint_config_to_arduino(final_joints)
+        # Send to Arduino unless no-send flag is set
+        if not args.no_send:
+            send_joint_config_to_arduino(final_joints, port=args.port)
+
+    except Exception as e:
+        print(f"Error calculating or sending joint configuration: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    # Ensure numpy and sympy use of pi is consistent
+    from numpy import pi
+   
